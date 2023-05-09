@@ -1,1 +1,1 @@
-# Hello world
+# Artifact approach worked
