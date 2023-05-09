@@ -10,6 +10,9 @@ pr:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  commitCount: $[ dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'] ]
+
 stages:
   - stage: check_pr_commits_count
     displayName: Check PR Commits Count
@@ -37,13 +40,11 @@ stages:
   - stage: create_temp_environment
     displayName: Create Temp Environment
     dependsOn: check_pr_commits_count
-   # condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'], '1')))
     jobs:
       - job: create_environment
         displayName: Create Environment
         steps:
           - bash: |
-              echo "Number of commits in the pull request: $(jobs.check_commits.outputs['commitCounter.commitCount'])"
+              commit_count=$(echo "$(commitCount)")
+              echo "Number of commits in the pull request: $commit_count"
             displayName: Print Commit Count
-
-
