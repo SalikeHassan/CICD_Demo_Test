@@ -36,7 +36,7 @@ stages:
             name: commitCounter
   - stage: create_temp_environment
     displayName: Create Temp Environment
-    condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'], '1')))
+    condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'], '1')))
     jobs:
       - job: create_environment
         displayName: Create Environment
@@ -46,7 +46,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                commit_count=$(echo "$(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'])")
+                commit_count=$(echo "$(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'])")
                 echo "Number of commits in the pull request: $commit_count"
 
 
