@@ -25,9 +25,7 @@ jobs:
     displayName: 'Fetch and Checkout Branches'
 
   - script: |
-      MERGE_BASE=$(git merge-base main dev)
-      echo "Merge base commit: $MERGE_BASE"
-      NUMBER_OF_COMMITS=$(git rev-list --count $MERGE_BASE..HEAD)
+      NUMBER_OF_COMMITS=$(git rev-list --count origin/$(Build.PullRequest.SourceBranchName)..origin/$(System.PullRequest.TargetBranch))
       echo "Number of commits in PR: $NUMBER_OF_COMMITS"
       echo "##vso[task.setvariable variable=numberOfCommits]$NUMBER_OF_COMMITS"
     displayName: 'Count Commits'
