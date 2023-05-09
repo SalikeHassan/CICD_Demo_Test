@@ -1,24 +1,37 @@
-# This pipeline will build and test a .NET 6 API project,
-# and count the commits in any open pull requests.
-
 trigger:
-  - main
-  - pull_request
+  branches:
+    include:
+      - main
 
-variables:
-  buildConfiguration: 'Release'
-  azureSubscription: '<your-subscription-name>'
+pr:
+  branches:
+    include:
+      - main
 
-stages:
-  - stage: CountCommits
-    displayName: 'Count Commits in Open Pull Requests'
-    jobs:
-      - job: CountCommits
-        displayName: 'Count Commits'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - script: |
-              count=$(git rev-list --count HEAD ^refs/heads/main)
-              echo "Number of commits in open pull requests: $count"
-            displayName: 'Count Commits'
+jobs:
+- job: CountCommits
+  displayName: 'Count Commits in PR'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: |
+      git fetch --all
+      git checkout main
+      git pull
+      git checkout dev
+      git pull
+      git merge-base main dev
+    displayName: 'Fetch and Checkout Branches'
+
+  - script: |
+      MERGE_BASE=$(git merge-base main dev)
+      echo "Merge base commit: $MERGE_BASE"
+      NUMBER_OF_COMMITS=$(git rev-list --count $MERGE_BASE..HEAD)
+      echo "Number of commits in PR: $NUMBER_OF_COMMITS"
+      echo "##vso[task.setvariable variable=numberOfCommits]$NUMBER_OF_COMMITS"
+    displayName: 'Count Commits'
+
+  - script: |
+      echo "Number of commits in this PR: $(numberOfCommits)"
+    displayName: 'Display Commit Count'
