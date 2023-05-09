@@ -17,15 +17,19 @@ jobs:
   steps:
   - script: |
       git fetch --all
-      git checkout main
+      SOURCE_BRANCH=$(echo $(System.PullRequest.SourceBranch) | sed 's/refs\/heads\///')
+      TARGET_BRANCH=$(echo $(System.PullRequest.TargetBranch) | sed 's/refs\/heads\///')
+      git checkout $TARGET_BRANCH
       git pull
-      git checkout dev
+      git checkout $SOURCE_BRANCH
       git pull
-      git merge-base main dev
+      git merge-base $TARGET_BRANCH $SOURCE_BRANCH
     displayName: 'Fetch and Checkout Branches'
 
   - script: |
-      NUMBER_OF_COMMITS=$(git rev-list --count origin/$(Build.PullRequest.SourceBranchName)..origin/$(System.PullRequest.TargetBranch))
+      MERGE_BASE=$(git merge-base $TARGET_BRANCH $SOURCE_BRANCH)
+      echo "Merge base commit: $MERGE_BASE"
+      NUMBER_OF_COMMITS=$(git rev-list --count $MERGE_BASE..HEAD)
       echo "Number of commits in PR: $NUMBER_OF_COMMITS"
       echo "##vso[task.setvariable variable=numberOfCommits]$NUMBER_OF_COMMITS"
     displayName: 'Count Commits'
