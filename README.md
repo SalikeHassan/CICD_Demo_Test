@@ -1,1 +1,1 @@
-# Artifact approach worked
+# Combined the jobs
