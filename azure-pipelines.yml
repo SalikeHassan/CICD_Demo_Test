@@ -23,7 +23,7 @@ jobs:
         targetType: inline
         script: |
           git fetch origin
-          SOURCE_BRANCH_NAME=$(echo $(Build.SourceBranchName))
+          SOURCE_BRANCH_NAME=$(echo $(System.PullRequest.SourceBranch))
           TARGET_BRANCH_NAME=$(echo $(System.PullRequest.TargetBranch) | sed 's/refs\/heads\///')
           echo "Source branch: $SOURCE_BRANCH_NAME"
           echo "Target branch: $TARGET_BRANCH_NAME"
