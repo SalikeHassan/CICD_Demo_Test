@@ -12,7 +12,6 @@ variables:
 stages:
   - stage: CountCommits
     displayName: 'Count Commits in Open Pull Requests'
-    dependsOn: Build
     jobs:
       - job: CountCommits
         displayName: 'Count Commits'
