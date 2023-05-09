@@ -19,6 +19,6 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
           - script: |
-              count=$(git rev-list --count HEAD ^main)
+              count=$(git rev-list --count HEAD ^refs/heads/main)
               echo "Number of commits in open pull requests: $count"
             displayName: 'Count Commits'
