@@ -11,7 +11,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  commitCount: $[ dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'] ]
+  commitCount: 0
 
 stages:
   - stage: check_pr_commits_count
