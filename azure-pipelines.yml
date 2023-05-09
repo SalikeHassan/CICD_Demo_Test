@@ -42,12 +42,8 @@ stages:
       - job: create_environment
         displayName: Create Environment
         steps:
-          - task: Bash@3
+          - bash: |
+              echo "Number of commits in the pull request: $(jobs.check_commits.outputs['commitCounter.commitCount'])"
             displayName: Print Commit Count
-            inputs:
-              targetType: inline
-              script: |
-                commit_count=$(echo "$(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'])")
-                echo "Number of commits in the pull request: $commit_count"
 
 
