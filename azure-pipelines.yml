@@ -32,17 +32,24 @@ stages:
                 echo "Target branch: $TARGET_BRANCH_NAME"
                 commit_count=$(git rev-list --count origin/$TARGET_BRANCH_NAME..origin/$SOURCE_BRANCH_NAME)
                 echo "Commit count: $commit_count"
-                echo "##vso[task.setvariable variable=commitCount;isOutput=true]$commit_count"
-            name: commitCounter
+                echo $commit_count > commit_count.txt
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: commit_count.txt
+              artifactName: commitCount
+
   - stage: create_temp_environment
     displayName: Create Temp Environment
     dependsOn: check_pr_commits_count
     jobs:
       - job: create_environment
         displayName: Create Environment
-        variables:
-          commitCount: $[ dependencies.check_commits.outputs['commitCounter.commitCount'] ]
         steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: commitCount
+              path: $(System.DefaultWorkingDirectory)
           - script: |
-              echo "Number of commits in the pull request: $(commitCount)"
+              commit_count=$(cat $(System.DefaultWorkingDirectory)/commit_count.txt)
+              echo "Number of commits in the pull request: $commit_count"
             displayName: Print Commit Count
