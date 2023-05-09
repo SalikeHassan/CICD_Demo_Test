@@ -10,22 +10,43 @@ pr:
 pool:
   vmImage: 'ubuntu-latest'
 
-jobs:
-- job: check_commits
-  displayName: Check PR Commits
-  condition: eq(variables['Build.Reason'], 'PullRequest')
-  steps:
-    - checkout: self
-      fetchDepth: 0
-    - task: Bash@3
-      displayName: Check PR Commit Count
-      inputs:
-        targetType: inline
-        script: |
-          git fetch origin
-          SOURCE_BRANCH_NAME=$(echo $(System.PullRequest.SourceBranch))
-          TARGET_BRANCH_NAME=$(echo $(System.PullRequest.TargetBranch) | sed 's/refs\/heads\///')
-          echo "Source branch: $SOURCE_BRANCH_NAME"
-          echo "Target branch: $TARGET_BRANCH_NAME"
-          commit_count=$(git rev-list --count origin/$SOURCE_BRANCH_NAME..origin/$TARGET_BRANCH_NAME)
-          echo "Commit count: $commit_count"
+stages:
+  - stage: check_pr_commits_count
+    displayName: Check PR Commits Count
+    jobs:
+      - job: check_commits
+        displayName: Check Commits
+        condition: eq(variables['Build.Reason'], 'PullRequest')
+        steps:
+          - checkout: self
+            fetchDepth: 0
+          - task: Bash@3
+            displayName: Check PR Commit Count
+            inputs:
+              targetType: inline
+              script: |
+                git fetch origin
+                SOURCE_BRANCH_NAME=$(echo $(System.PullRequest.SourceBranch))
+                TARGET_BRANCH_NAME=$(echo $(System.PullRequest.TargetBranch) | sed 's/refs\/heads\///')
+                echo "Source branch: $SOURCE_BRANCH_NAME"
+                echo "Target branch: $TARGET_BRANCH_NAME"
+                commit_count=$(git rev-list --count origin/$SOURCE_BRANCH_NAME..origin/$TARGET_BRANCH_NAME)
+                echo "Commit count: $commit_count"
+                echo "##vso[task.setvariable variable=commitCount;isOutput=true]$commit_count"
+            name: commitCounter
+
+  - stage: create_temp_environment
+    displayName: Create Temp Environment
+    condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), gt(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'], '1')))
+    jobs:
+      - job: create_environment
+        displayName: Create Environment
+        steps:
+          - task: Bash@3
+            displayName: Print Commit Count
+            inputs:
+              targetType: inline
+              script: |
+                commit_count=$(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'])
+                echo "Number of commits in the pull request: $commit_count"
+          # Add your steps to create the temporary environment
