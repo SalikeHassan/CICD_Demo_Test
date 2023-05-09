@@ -38,8 +38,8 @@ stages:
                 echo "##vso[task.setvariable variable=commitCount]$commit_count"
                 echo "Commit count from task output: $commit_count"
             name: commitCounter
-            outputs:
-              commitCount: ${{ steps.commitCounter.outputs.commitCount }}  
+        outputs:
+          commitCount: ${{ steps.commitCounter.outputs.commitCount }}
   - stage: create_temp_environment
     displayName: Create Temp Environment
     dependsOn: check_pr_commits_count
