@@ -46,6 +46,6 @@ stages:
         displayName: Create Environment
         steps:
           - script: |
-              commit_count=$(echo "$(commitCount)")
+              commit_count=$(echo "${{ variables.commitCount }}")
               echo "Number of commits in the pull request: $commit_count"
             displayName: Print Commit Count
