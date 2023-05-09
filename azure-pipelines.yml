@@ -35,7 +35,7 @@ stages:
                 echo "Target branch: $TARGET_BRANCH_NAME"
                 commit_count=$(git rev-list --count origin/$TARGET_BRANCH_NAME..origin/$SOURCE_BRANCH_NAME)
                 echo "Commit count: $commit_count"
-                echo "##vso[task.setvariable variable=commitCount;isOutput=true]$commit_count"
+                echo "##vso[task.setvariable variable=commitCount]$commit_count"
             name: commitCounter
   - stage: create_temp_environment
     displayName: Create Temp Environment
