@@ -1,0 +1,25 @@
+# This pipeline will build and test a .NET 6 API project,
+# and count the commits in any open pull requests.
+
+trigger:
+  - main
+  - pull_request
+
+variables:
+  buildConfiguration: 'Release'
+  azureSubscription: '<your-subscription-name>'
+
+stages:
+  - stage: CountCommits
+    displayName: 'Count Commits in Open Pull Requests'
+    dependsOn: Build
+    jobs:
+      - job: CountCommits
+        displayName: 'Count Commits'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              count=$(git rev-list --count HEAD ^main)
+              echo "Number of commits in open pull requests: $count"
+            displayName: 'Count Commits'
