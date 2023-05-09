@@ -35,9 +35,9 @@ stages:
                 echo "##vso[task.setvariable variable=commitCount;isOutput=true]$commit_count"
             name: commitCounter
 
-  - stage: create_temp_environment
+- stage: create_temp_environment
     displayName: Create Temp Environment
-    condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), eq(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'], '1')))
+    condition: or(ne(variables['Build.Reason'], 'PullRequest'), eq(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'], '1'))
     jobs:
       - job: create_environment
         displayName: Create Environment
@@ -47,6 +47,6 @@ stages:
             inputs:
               targetType: inline
               script: |
-                commit_count=$(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'])
+                commit_count=$(echo "$(dependencies.check_pr_commits_count.jobs.check_commits.outputs['commitCounter.commitCount'])")
                 echo "Number of commits in the pull request: $commit_count"
-          # Add your steps to create the temporary environment
+
