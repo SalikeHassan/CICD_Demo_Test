@@ -11,8 +11,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-  - stage: check_pr_commits_count
-    displayName: Check PR Commits Count
+  - stage: create_temp_environment
+    displayName: Create Temp Environment
     jobs:
       - job: check_commits
         displayName: Check Commits
@@ -31,31 +31,10 @@ stages:
                 echo "Source branch: $SOURCE_BRANCH_NAME"
                 echo "Target branch: $TARGET_BRANCH_NAME"
                 commit_count=$(git rev-list --count origin/$TARGET_BRANCH_NAME..origin/$SOURCE_BRANCH_NAME)
-                echo "Commit count: $commit_count"
-                echo $commit_count > commit_count.txt
-          - task: PublishPipelineArtifact@1
-            inputs:
-              targetPath: commit_count.txt
-              artifactName: commitCount
-
-  - stage: create_temp_environment
-    displayName: Create Temp Environment
-    dependsOn: check_pr_commits_count
-    jobs:
-      - job: setup_commit_count_variable
-        displayName: Setup Commit Count Variable
-        steps:
-          - task: DownloadPipelineArtifact@2
-            inputs:
-              artifactName: commitCount
-              path: $(System.DefaultWorkingDirectory)
-          - script: |
-              commit_count=$(cat $(System.DefaultWorkingDirectory)/commit_count.txt)
-              echo "##vso[task.setvariable variable=commitCount]$commit_count"
-            displayName: Set Commit Count Variable
+                echo "##vso[task.setvariable variable=commitCount]$commit_count"
       - job: create_environment
         displayName: Create Environment
-        dependsOn: setup_commit_count_variable
+        dependsOn: check_commits
         condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(variables['commitCount'], '1')))
         steps:
           - script: |
