@@ -36,7 +36,7 @@ stages:
             name: commitCounter
   - stage: create_temp_environment
     displayName: Create Temp Environment
-    condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'], '1')))
+   # condition: not(and(eq(variables['Build.Reason'], 'PullRequest'), ne(dependencies.check_pr_commits_count.check_commits.outputs['commitCounter.commitCount'], '1')))
     jobs:
       - job: create_environment
         displayName: Create Environment
