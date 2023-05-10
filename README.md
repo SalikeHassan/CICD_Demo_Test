@@ -1,2 +1,1 @@
-# CI CD Pipeline Setup with Checks
-# Checkout set to self
+# CI CD Pipeline Check Demo 2
