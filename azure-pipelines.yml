@@ -18,8 +18,8 @@ stages:
         displayName: Check Commits
         condition: eq(variables['Build.Reason'], 'PullRequest')
         steps:
-          - checkout: self
-            fetchDepth: 0
+          - checkout: none
+            #fetchDepth: 0
           - task: Bash@3
             displayName: Check PR Commit Count
             inputs:
@@ -41,4 +41,4 @@ stages:
         steps:
           - script: |
               echo "Number of commits in the pull request: $(dependencies.check_commits.outputs['checkCommitCountVars.commitCount'])"
-            displayName: Print Commit Count
+            displayName: Environment Created
