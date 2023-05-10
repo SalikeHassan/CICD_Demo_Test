@@ -18,8 +18,8 @@ stages:
         displayName: Check Commits
         condition: eq(variables['Build.Reason'], 'PullRequest')
         steps:
-          - checkout: none
-            fetchDepth: 0
+          - checkout: self
+            #fetchDepth: 0
           - task: Bash@3
             displayName: Check PR Commit Count
             inputs:
